@@ -31,12 +31,15 @@ print(len(test_cls))
 train_loss_history = []
 # 2. build network  img ==> [128, 128, 3]
 # model = VGG16(num_class).to(Device)
-model = ResNet18(num_class).to(Device)
-# model = ResNet50(num_class)
+# model = ResNet18(num_class).to(Device)
+# model = ResNet34(num_class).to(Device)
+# model = ResNet50(num_class).to(Device)
+model = ResNet101(num_class).to(Device)
+# model = ResNet152(num_class).to(Device)
 
 loss = torch.nn.CrossEntropyLoss()
 learning_rate = 0.01
-num_iter = 500
+num_iter = 300000
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, weight_decay=1e-4, momentum=0.9)
 # optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, eps=1.0)
 
