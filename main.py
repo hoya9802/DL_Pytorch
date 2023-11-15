@@ -50,6 +50,9 @@ for it in range(num_iter):
     gt_tensor = torch.nn.functional.one_hot(gt_tensor, num_class).squeeze()
     gt_tensor = torch.permute(gt_tensor, (0, 3, 1, 2)) # np.transpose랑 같다.
 
+    # 만약 pytorch version이 낮아서 torch.permute을 one_hot()이후 지원하지 않으면 아래 코드를 위 2개 코드 대신 사용!
+    # gt_tensor = gt_tensor[:,:,:,0]
+
     train_loss = torch.nn.functional.cross_entropy(pred, gt_tensor.type(torch.float32))
     train_loss.backward()
     optimizer.step()
