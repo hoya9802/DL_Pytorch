@@ -33,7 +33,8 @@ train_loss_history = []
 
 # model = ResNet18(num_class).to(Device)
 # model = ResNet18_sq(num_class).to(Device)
-model = ResNet18_BAM(num_class).to(Device)
+# model = ResNet18_BAM(num_class).to(Device)
+model = ResNet18_CBAM(num_class).to(Device)
 
 
 loss = torch.nn.CrossEntropyLoss() 

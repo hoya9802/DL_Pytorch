@@ -165,6 +165,114 @@ class ResBlock_BAM(nn.Module):
 
         return x
 
+class ResBlock_CBAM(nn.Module):
+    def __init__(self, c_in, c_out, bdown=False, r = 16, d = 4):
+        super(ResBlock_CBAM, self).__init__()
+        stride = 2 if bdown else 1
+        
+        self.c_in = c_in
+        self.c_out = c_out
+
+        self.bn1 = nn.BatchNorm2d(c_in)
+        self.ReLU = nn.ReLU()
+        self.conv1 = nn.Conv2d(c_in, c_out, kernel_size=(3, 3), padding=1, stride=(stride, stride))
+
+        self.bn2 = nn.BatchNorm2d(c_out)
+        self.conv2 = nn.Conv2d(c_out, c_out, kernel_size=(3, 3), padding=1)
+
+        if c_in != c_out:
+            self.identity = nn.Conv2d(c_in, c_out, kernel_size=(1, 1), stride=(stride, stride))
+
+        # ----- CBAM
+
+        self.ch_at = nn.Sequential(
+            FullyConnected(c_out, c_out // r, activation_fn='relu'),
+            FullyConnected(c_out // r, c_out, activation_fn='linear'),
+        )
+
+
+        self.sp_at = nn.Sequential(
+            nn.Conv2d(2, 1, kernel_size=(7, 7), padding=3),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        y = x      # [8, 512, 64, 64]
+        x = self.bn1(x)
+        x = self.ReLU(x)
+        x = self.conv1(x) 
+
+        x = self.bn2(x)
+        x = self.ReLU(x)
+        x = self.conv2(x) 
+
+        if self.c_in != self.c_out:
+            y = self.identity(y) # [8, 512, 32, 32]
+
+        x = x + y
+
+        # --- CBAM
+        z = x
+        x_avp = torch.mean(x, dim=(2, 3)) # [B, C]
+        x_avp = self.ch_at(x_avp) 
+        
+        x_max, _ = torch.max(x, dim=3) # [B, C, H, W] -> [B, C, H]
+        x_max, _ = torch.max(x_max, dim=2) # [B, C, H] -> [B, C]
+        x_max = self.ch_at(x_max)
+
+        x_ch = torch.sigmoid(x_avp + x_max)
+        x_ch = x_ch[:, :, np.newaxis, np.newaxis]
+        x = x + x_ch
+
+        x_sp_avg = torch.mean(x, dim=1, keepdim=True) # [B, 1, H, W]
+        x_sp_max, _ = torch.max(x, dim=1, keepdim=True) # [B, 1, H, W]
+        x_sp = torch.cat([x_sp_avg, x_sp_max], dim=1) # [B, 2, H, W]
+        x_sp = self.sp_at(x_sp)
+        x = x * x_ch
+        x = x + z
+
+
+        return x
+
+
+class ResNet18_CBAM(nn.Module):
+    def __init__(self, num_class):
+        super(ResNet18_CBAM, self).__init__()
+        self.conv = nn.Conv2d(3, 64, kernel_size=(7, 7), padding=3, stride=(2, 2))
+        # self.bn = nn.BatchNorm2d(64)
+        # self.ReLU = nn.ReLU()
+        self.maxp = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+        self.blocks = nn.Sequential(
+            ResBlock_CBAM(64, 64),
+            ResBlock_CBAM(64, 64),
+
+            ResBlock_CBAM(64, 128, bdown=True),
+            ResBlock_CBAM(128, 128),
+
+            ResBlock_CBAM(128, 256, bdown=True),
+            ResBlock_CBAM(256, 256),
+
+            ResBlock_CBAM(256, 512, bdown=True),
+            ResBlock_CBAM(512, 512),
+        )
+
+        self.fc = nn.Linear(512, num_class)
+        self.bn_last = torch.nn.BatchNorm2d(512)
+        self.relu_last = torch.nn.ReLU()
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.maxp(x)
+
+        x = self.blocks(x)
+        x = self.bn_last(x)
+        x = self.relu_last(x)
+
+        x = torch.mean(x, dim=(2, 3)) # [B, C, H, W] = [0, 1, 2, 3]
+        x = self.fc(x)
+
+        return x
 
 class ResNet18_sq(nn.Module):
     def __init__(self, num_class):
