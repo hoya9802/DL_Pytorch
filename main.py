@@ -12,7 +12,7 @@ print(Device)
 num_class = 200
 batch_size = 64
 
-model_save_path = '/Users/euntaeklee/torch_env/torch_class/DenseNet/model/'
+model_save_path = 'DenseNet/model/'
 path = "/Users/euntaeklee/torch_env/torch_class/data/tinyImageNet/"
 
 print('load_zip')
@@ -31,7 +31,7 @@ print(len(test_cls))
 train_loss_history = []
 # 2. build network  img ==> [128, 128, 3]
 
-model = DenseNet121(num_class).to(Device)
+model = DenseNet121(num_class, 32).to(Device)
 
 loss = torch.nn.CrossEntropyLoss()
 learning_rate = 0.01
