@@ -4,6 +4,13 @@ import numpy as np
 import zipfile
 import re
 
+
+def zip_sort(data, data_cls):
+    data = sorted(data[1:], key=lambda x: int(re.split('[/.]', x)[1]))
+    data_cls = data_cls[:-1]
+
+    return data, data_cls
+
 def Mini_batch_training(train_img, train_cls, batch_size):
     batch_img = np.zeros((batch_size, 128, 128, 3))
     batch_cls = np.zeros(batch_size)
@@ -49,9 +56,3 @@ def Mini_batch_training_zip(z_file, z_file_list, train_cls, batch_size):
         batch_cls[it] = train_cls[temp]
 
     return batch_img, batch_cls
-
-def zip_sort(data, data_cls):
-    data = sorted(data[1:], key=lambda x: int(re.split('[/.]', x)[1]))
-    data_cls = data_cls[:-1]
-
-    return data, data_cls
