@@ -31,7 +31,7 @@ print(len(test_cls))
 train_loss_history = []
 # 2. build network  img ==> [128, 128, 3]
 
-model = DenseNet121(num_class, 32).to(Device)
+model = DenseNet121(num_class).to(Device)
 
 loss = torch.nn.CrossEntropyLoss()
 learning_rate = 0.01
