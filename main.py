@@ -22,6 +22,7 @@ test_img, test_gt = load_semantic_seg_data(path + 'test/test_img/', path + 'test
 print('load_image_finish')
 
 train_loss_history = []
+mean_iou_history = []
 
 model = PSPNet(num_class).to(Device)
 
@@ -60,10 +61,35 @@ for it in range(num_iter):
     if it % 100 == 0:
         consum_time = time.time() - start_time
         train_loss_history.append(train_loss.item())
-        print('iter: %d   train loss: %.5f   lr: %.5f   time: %.4f'
-              %(it, train_loss.item(), optimizer.param_groups[0]['lr'], consum_time))
-        model.eval()
-        start_time = time.time()
+        with torch.no_grad():
+            # Loop through the test dataset
+            conf_matrix = np.zeros((num_class, num_class), dtype=np.int64)
+            for i in range(len(test_img)):
+                img_temp = test_img[i:i + 1, :, :, :].astype(np.float32)
+                img_temp = (img_temp / 255.0) * 2 - 1
+                img_temp = np.transpose(img_temp, (0, 3, 1, 2))
+
+                pred = model(torch.from_numpy(img_temp.astype(np.float32)).to(Device))
+                pred = pred.cpu().numpy()
+                pred = np.argmax(pred[0, :, :, :], axis=0)
+                gt = test_gt[i, :, :, 0]
+
+                # Flatten the arrays for confusion matrix
+                flat_pred = pred.flatten()
+                flat_gt = gt.flatten()
+
+                # Update confusion matrix
+                conf_matrix += confusion_matrix(flat_gt, flat_pred, labels=np.arange(num_class))
+
+            iou_per_class = np.diag(conf_matrix) / (
+                    conf_matrix.sum(axis=1) + conf_matrix.sum(axis=0) - np.diag(conf_matrix) + 1e-10)
+            mean_iou = np.mean(iou_per_class)
+            mean_iou_history.append(mean_iou)
+
+            print('iter: %d   train loss: %.5f   lr: %.5f   time: %.4f   Mean IOU: %.4f'
+                  % (it, train_loss.item(), optimizer.param_groups[0]['lr'], consum_time, mean_iou))
+            model.train()
+            start_time = time.time()
 
     if it % 10000 == 0: # and it != 0
         print('SAVING MODEL')
