@@ -20,7 +20,7 @@ def load_semantic_seg_data(img_path, gt_path, img_size):
     gts = np.zeros((len(gt_names), img_size, img_size, 3), dtype=np.uint8) # [B, H, W, C]
 
     for it in range(len(img_names)):
-        # print('%d / %d' %(it, len(img_names)))
+        print('%d / %d' %(it, len(img_names)))
 
         img = cv2.imread(img_path + img_names[it])
         img = cv2.resize(img, (img_size, img_size))
@@ -28,7 +28,7 @@ def load_semantic_seg_data(img_path, gt_path, img_size):
 
     # ------- gt!!!
     for it in range(len(gt_names)):
-        # print('%d / %d' %(it, len(gt_names)))
+        print('%d / %d' %(it, len(gt_names)))
         gt = cv2.imread(gt_path + gt_names[it])
         gt_index = np.zeros(shape=(gt.shape[0], gt.shape[1], 3), dtype=np.uint8)
         for ic in range(len(VOC_COLORMAP)):
