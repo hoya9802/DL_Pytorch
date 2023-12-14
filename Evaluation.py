@@ -4,7 +4,7 @@ from function import load_semantic_seg_data
 from network import *
 from sklearn.metrics import confusion_matrix
 
-Device = torch.device("mps")
+Device = torch.device("cpu")
 print(Device)
 
 num_class = 21
