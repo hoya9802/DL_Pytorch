@@ -1,53 +1,64 @@
-import numpy as np
 import torch
+import numpy as np
+import cv2
 from function import load_semantic_seg_data
 from network import *
-from sklearn.metrics import confusion_matrix
 
-# Set the device to CPU or GPU
-Device = torch.device("cpu")  
-
-print(Device)
-
-num_class = 21
 img_size = 224
-# ... (your existing code)
-path = "/Users/euntaeklee/torch_env/torch_class/data/VOC_dataset/"
-# Load test data
-test_img, test_gt = load_semantic_seg_data(path + 'test/test_img/', path + 'test/test_gt/', img_size=img_size)
+num_class = 21
 
-# Load the saved model
-model_path = '/Users/euntaeklee/Downloads/unet_model/model_90000.pt'
-loaded_model = UNet(num_class)
-loaded_model.load_state_dict(torch.load(model_path, map_location=Device))
-loaded_model.eval()
+def compute_mean_iou(pred, target, num_classes):
+    ious = []
 
-# Initialize variables for confusion matrix
-num_classes = 21
-conf_matrix = np.zeros((num_classes, num_classes), dtype=np.int64)
+    for cls in range(num_classes):
+        pred_cls = (pred == cls)
+        target_cls = (target == cls)
 
-# Loop through the test dataset
-for i in range(len(test_img)):
-    img_temp = test_img[i:i + 1, :, :, :].astype(np.float32)
-    img_temp = (img_temp / 255.0) * 2 - 1
-    img_temp = np.transpose(img_temp, (0, 3, 1, 2))
+        intersection = np.logical_and(pred_cls, target_cls).sum()
+        union = np.logical_or(pred_cls, target_cls).sum()
+        iou = intersection / (union + 1e-10)
+        ious.append(iou)
 
-    with torch.no_grad():
-        pred = loaded_model(torch.from_numpy(img_temp.astype(np.float32)).to(Device))
+    return np.mean(ious)
 
-    pred = pred.cpu().numpy()
-    pred = np.argmax(pred[0, :, :, :], axis=0)
-    gt = test_gt[i, :, :, 0]
 
-    # Flatten the arrays for confusion matrix
-    flat_pred = pred.flatten()
-    flat_gt = gt.flatten()
+def evaluate_model(model, test_img, test_gt, img_size, num_classes):
+    model.eval()
+    num_samples = test_img.shape[0]
+    mIOU_list = []
 
-    # Update confusion matrix
-    conf_matrix += confusion_matrix(flat_gt, flat_pred, labels=np.arange(num_classes))
+    for itest in range(num_samples):
+        img_temp = test_img[itest:itest + 1, :, :, :].astype(np.float32)
+        img_temp = (img_temp / 255.0) * 2 - 1  # [1, 28, 28]
+        img_temp = np.transpose(img_temp, (0, 3, 1, 2))
 
-# Calculate Mean IOU
-iou_per_class = np.diag(conf_matrix) / (conf_matrix.sum(axis=1) + conf_matrix.sum(axis=0) - np.diag(conf_matrix) + 1e-10)
-mean_iou = np.mean(iou_per_class)
+        with torch.no_grad():
+            pred = model(torch.from_numpy(img_temp.astype(np.float32)))
 
-print('Mean IOU:', mean_iou)
+        pred = pred.cpu().numpy()
+        pred = np.argmax(pred[0, :, :, :], axis=0)
+        pred = pred[:, :, np.newaxis]
+
+        gt_mask = test_gt[itest, :, :, 1].astype(np.int64)
+
+        pred_resized = cv2.resize(pred, (img_size, img_size), interpolation=cv2.INTER_NEAREST)
+
+        mIOU = compute_mean_iou(pred_resized, gt_mask, num_classes)
+        mIOU_list.append(mIOU)
+
+    average_mIOU = np.mean(mIOU_list)
+    return average_mIOU
+
+model_path = "/Users/euntaeklee/Downloads/unet_model/model_90000.pt"  # Replace with the actual path to your saved model
+model = UNet(num_class)
+model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+model.eval()
+
+
+test_path = "/Users/euntaeklee/torch_env/torch_class/data/VOC_dataset/test/"
+test_img, test_gt = load_semantic_seg_data(test_path + 'test_img/', test_path + 'test_gt/', img_size=img_size)
+
+
+average_mIOU = evaluate_model(model, test_img, test_gt, img_size, num_class)
+
+print("Mean IOU on the test dataset: {:.4f}".format(average_mIOU))
