@@ -57,3 +57,14 @@ def Mini_batch_training_seg(train_img, train_gt, batch_size, img_size):
         batch_gt[it] = train_gt[temp, :, :, 0:1]
 
     return batch_img, batch_gt
+
+def compute_mean_iou(pred, target, num_classes):
+    ious = []
+    for cls in range(num_classes):
+        pred_cls = (pred == cls)
+        target_cls = (np.squeeze(target, axis=-1) == cls)  
+        intersection = np.logical_and(pred_cls, target_cls).sum()
+        union = np.logical_or(pred_cls, target_cls).sum()
+        iou = intersection / (union + 1e-10)
+        ious.append(iou)
+    return np.mean(ious)
