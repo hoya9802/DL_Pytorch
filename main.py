@@ -27,7 +27,7 @@ mean_iou_history = []
 model = FCN_8S(num_class).to(Device)
 
 learning_rate = 0.01
-num_iter = 300000
+num_iter = 50000
 optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, weight_decay=5e-4, momentum=0.9)
 
 start_time = time.time()

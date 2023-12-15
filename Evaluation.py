@@ -9,7 +9,6 @@ num_class = 21
 
 def compute_mean_iou(pred, target, num_classes):
     ious = []
-
     for cls in range(num_classes):
         pred_cls = (pred == cls)
         target_cls = (target == cls)
@@ -17,7 +16,8 @@ def compute_mean_iou(pred, target, num_classes):
         intersection = np.logical_and(pred_cls, target_cls).sum() 
         union = np.logical_or(pred_cls, target_cls).sum()
         iou = intersection / (union + 1e-10)
-        ious.append(iou)
+        if iou > 0.0:
+            ious.append(iou)
 
     return np.mean(ious)
 
@@ -47,6 +47,7 @@ def evaluate_model(model, test_img, test_gt, img_size, num_classes):
         mIOU_list.append(mIOU)
 
     average_mIOU = np.mean(mIOU_list)
+    
     return average_mIOU
 
 model_path = "/Users/euntaeklee/Downloads/model/model_140000.pt"  
