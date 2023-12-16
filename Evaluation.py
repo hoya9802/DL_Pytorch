@@ -62,4 +62,4 @@ test_img, test_gt = load_semantic_seg_data(test_path + 'test_img/', test_path + 
 
 average_mIOU = evaluate_model(model, test_img, test_gt, img_size, num_class)
 
-print("Mean IOU on the test dataset: {:.4f}".format(average_mIOU))
+print("FCN Mean IOU on the test dataset: {:.4f}".format(average_mIOU))
