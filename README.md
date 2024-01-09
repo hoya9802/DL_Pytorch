@@ -1,6 +1,6 @@
 # DenseNet_Pytorch
 
-* If you want to know about information of DenseNet click here -> [Papaer Review - DenseNet](https://hoya9802.github.io/paper-review/DenseNet/)
+* If you want to know about the information of DenseNet click here -> [Papaer Review - DenseNet](https://hoya9802.github.io/paper-review/DenseNet/)
 
 ## Environment of Implementation
 
