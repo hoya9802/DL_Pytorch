@@ -1,5 +1,7 @@
 # FCN_pytorch
 
+* If you want to know about the information of FCN click here -> [Papaer Review - FCN](https://hoya9802.github.io/paper-review/FCN/)
+
 ## Environment of Implementation
 
 ### Version of Python
