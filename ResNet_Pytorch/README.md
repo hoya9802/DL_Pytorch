@@ -17,3 +17,15 @@ This dataset consists 0.2m images for training, and 51k for test, from 200 class
 
 ## Training
 The network is trained using stochastic gradient descent(SGD). On TinyImageNet I train using batch size 32 for 30k epochs. The initial learning is set to 0.01 and a momentum of 0.9, and is divided by 10 at 10k iteration and 20k interation of the total number of training epochs. Due to GPU memory constraints, this model is trained with a mini-batch size 32.
+
+## Model
+The [network.py](https://github.com/hoya9802/DL_Pytorch/blob/main/ResNet_Pytorch/network.py) include 5 types of ResNet models (ResNet-18, 34, 50, 101, 152)
+
+## Model Performance
+| Error Metric    | ResNet-18 | ResNet-34 | ResNet-50 |
+|-----------------|---------|---------|---------|
+| **Top-1 Error** |  50.05  |  48.78  |  47.99  |
+| **Top-5 Error** |  26.55  |  25.34  |  23.63  |
+
+## References
+ - [ResNet paper](https://arxiv.org/pdf/1512.03385)
