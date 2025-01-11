@@ -21,7 +21,15 @@ The network is trained using stochastic gradient descent(SGD). On TinyImageNet I
 ## Models
 The [network.py](https://github.com/hoya9802/DL_Pytorch/blob/main/Attention_Pytorch/network.py) include 3 Attention models (SE-ResNet-18, CBAM-ResNet-18, BAM-ResNet-18)
 
+## Model Performance
+epoch: 3000 / lr: 1e-2 / optimizer: SGD
+| Error Metric    | ResNet-18 | SE-ResNet-18 | BAM-18 | CBAM-18 |
+|-----------------|---------|---------|---------|---------|
+| **Top-1 Error** | 50.05%   | 47.52%   |  42.46%   |  41.54%   |
+| **Top-5 Error** | 26.55%   | 23.94%   |  19.98%   |  18.79%   |
+
+
 ## References
-- [CBAM: Convolutional Block Attention Module (2018)](https://arxiv.org/abs/1807.06521)
-- [BAM: Bottleneck Attention Module (2018)](https://arxiv.org/abs/1807.06541)
-- [Squeeze-and-Excitation Networks (2017)](https://arxiv.org/abs/1709.01507)
+- [CBAM: Convolutional Block Attention Module (2018)](https://arxiv.org/pdf/1807.06521)
+- [BAM: Bottleneck Attention Module (2018)](https://arxiv.org/pdf/1807.06514)
+- [Squeeze-and-Excitation Networks (2017)](https://arxiv.org/pdf/1709.01507)
