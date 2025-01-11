@@ -19,4 +19,4 @@ This dataset consists 0.2m images for training, and 51k for test, from 200 class
 The network is trained using stochastic gradient descent(SGD). On TinyImageNet I train using batch size 32 for 30k epochs. The initial learning is set to 0.01 and a momentum of 0.9, and is divided by 10 at 10k iteration and 20k interation of the total number of training epochs. Due to GPU memory constraints, this model is trained with a mini-batch size 32.
 
 ## Models
-The network.py include 3 Attention models (SE-ResNet-18, CBAM-ResNet-18, BAM-ResNet-18)
+The [network.py](https://github.com/hoya9802/DL_Pytorch/blob/main/Attention_Pytorch/network.py) include 3 Attention models (SE-ResNet-18, CBAM-ResNet-18, BAM-ResNet-18)
