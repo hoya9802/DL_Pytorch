@@ -35,6 +35,8 @@ Looking at Figure 1, previous models such as FCN and U-Net performed very well i
 
 <img width="514" alt="스크린샷 2025-01-12 오전 1 20 58" src="https://github.com/user-attachments/assets/d9992796-3a6d-496b-8157-e727d8824c9d" />
 
+You can view the original images of the results [here](https://github.com/hoya9802/DL_Pytorch/tree/main/UNet_Pytorch).<br>
+
 Compared to previous models, we observed that PSP-Net extracts more objects with greater detail across all images. Although the images in the first row suggest that PSP-Net is less fine-tuned, it is important to note that FCN-8s was trained for 150,000 epochs, U-Net for 100,000 epochs, while PSP-Net was only trained for 20,000 epochs. Therefore, since FCN-8s was trained 7.5 times longer than PSP-Net, we believe that if PSP-Net undergoes sufficient training, it could achieve even more detailed results, similar to FCN-8s (See Figure 2.).
 
 ## Reference
