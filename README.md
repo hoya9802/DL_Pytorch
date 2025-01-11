@@ -13,4 +13,4 @@
 | [U-Net](https://github.com/hoya9802/DL_Pytorch/tree/main/UNet_Pytorch) - 2015년<br>
 | [VGG16](https://github.com/hoya9802/DL_Pytorch/tree/main/VGG16_Pytorch) - 2014년<br>
 
-** 자세한 내용은 해당 폴더의 Readme를 확인해 주세요! **
+**자세한 내용은 해당 폴더의 Readme를 확인해 주세요!**
